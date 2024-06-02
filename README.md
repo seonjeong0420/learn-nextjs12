@@ -71,11 +71,13 @@ next.js에서 제공해주는 head 패키지
 
 API Key 숨기는 방법
 
-1. next.config.js
+[next.config.js]
 
 - rewrites() 사용
 
 ```bash
+const API_KEY = "10923b261ba94d897ac6b81148314a3f";
+
 async rewrites() {
   return [
     {
@@ -112,6 +114,42 @@ async redirects() {
     },
   ];
 },
+```
+
+2. 환경변수 .env로 API_KEY 관리하기
+   2-1. 프로젝트 최상위에 .env 파일 만들어서 API_KEY 정보 등록하기
+   `API_KEY = 10923b261ba94d897ac6b81148314a3f`
+
+   2-2. next.config.js에 아래와 같이 작성
+
+```bash
+const API_KEY = process.env.API_KEY; // .env 파일에 API_KEY 정보 제공
+
+module.exports = {
+  reactStrictMode: true,
+  async redirects() {
+    return [
+      {
+        source: "/contact/:path*",
+        destination: "/form/:path*",
+        permanent: false,
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: "/api/movies",
+        destination: `https://api.themoviedb.org/3/movie/popular?api_key=${API_KEY}`,
+      },
+      {
+        source: "/api/movies/:id",
+        destination: `https://api.themoviedb.org/3/movie/:id?api_key=${API_KEY}`,
+      },
+    ];
+  },
+};
+
 ```
 
 ### getServerSideProps()
